@@ -9,6 +9,7 @@ require 'stagger-nrpe/connection'
 require 'stagger-nrpe/distribution'
 require 'stagger-nrpe/stagger_client'
 require 'metis/nrpe_packet'
+require 'sentry-raven'
 
 # Actually runs the server
 require 'stagger-nrpe/server'
