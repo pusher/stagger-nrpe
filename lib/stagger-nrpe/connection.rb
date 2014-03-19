@@ -3,10 +3,19 @@ class NrpeConnection < EM::Connection
   def initialize(check_definitions, stagger_client)
     @check_definitions = check_definitions
     @stagger_client = stagger_client
+    @data = ''
   end
 
   def receive_data(data)
-    query = NrpePacket.read(data)
+    @data << data
+    # Conveniently, NRPE is a fixed size request
+    if @data.bytesize == NrpePacket::MAX_PACKET_SIZE
+      process
+    end
+  end
+
+  def process
+    query = NrpePacket.read(@data)
 
     # ensure it doesn't specify any commands
     if query.buffer =~ /!/
