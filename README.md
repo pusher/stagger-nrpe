@@ -20,6 +20,10 @@ You may request multiple metrics in your check:
 
 ```ruby
 $DEFS.define(check_name, [metric_a, metric_b]) { |metric_a_value, metric_b_value|
-  metric_a_value > metric_b_value ? [:critical, "a was greater than b!"]
-                                  : [:ok, "ok"]
+  if metric_a_value > metric_b_value
+    [:critical, "a was greater than b!"]
+  else
+    [:ok, "ok"]
+  end
 }
+```
