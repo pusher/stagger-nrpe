@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '../lib'))
+
+require 'eventmachine'
+require 'stagger-nrpe/check_definitions'
+require 'stagger-nrpe/connection'
+require 'stagger-nrpe/distribution'
+require 'stagger-nrpe/stagger_client'
+require 'metis/nrpe_packet'
+
+# Actually runs the server
+require 'stagger-nrpe/server'
