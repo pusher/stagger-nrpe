@@ -8,11 +8,11 @@ class StaggerClient
     @port = port
   end
 
-  def get(name)
+  def get(names)
     df = EM::DefaultDeferrable.new
 
     refresh_if_stale.callback {
-      df.succeed(@all[name])
+      df.succeed(names.map { |name| @all[name].to_f })
     }.errback {
       df.fail
     }

@@ -4,10 +4,10 @@ class CheckDefinitions
     @simple_definitions = {}
   end
 
-  def define(name, metric_name, &block)
+  def define(name, metric_names, &block)
     raise "Already defined #{name}" if @simple_definitions[name]
 
-    @simple_definitions[name] = { metric: metric_name, block: block }
+    @simple_definitions[name] = { metrics: [metric_names].flatten, block: block }
   end
 
   def get(name)

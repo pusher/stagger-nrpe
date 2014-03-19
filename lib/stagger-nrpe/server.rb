@@ -1,17 +1,24 @@
 config_dir = ARGV[0] || '/etc/stagger-nrpe.d'
 
-Raven.configure do |config|
-  config.dsn = 'https://d379ccf06e5540a8a7f256239f6b287a:5cf0b7edb57d436cb67d25721a02d9c9@app.getsentry.com/10704'
+unless ENVIRONMENT == 'development'
+  Raven.configure do |config|
+    config.dsn = 'https://d379ccf06e5540a8a7f256239f6b287a:5cf0b7edb57d436cb67d25721a02d9c9@app.getsentry.com/10704'
+  end
 end
-RAVEN_TAGS = {
+
+def error_handler(e)
+  puts e
+  puts e.backtrace.join("\n")
+  Raven.capture_exception(e, {
     tags: {
       service: "stagger-nrpe",
-      cluster: ENV['ENVIRONMENT'] || "development"
-    })
-  }
+      cluster: ENVIRONMENT
+    }
+  })
+end
 
 EM.error_handler { |e|
-  Raven.capture_exception(e, RAVEN_TAGS)
+  error_handler(e)
 }
 
 puts "Loading config from #{config_dir}"
@@ -19,9 +26,10 @@ puts "Loading config from #{config_dir}"
 $DEFS = CheckDefinitions.new
 Dir.glob("#{config_dir}/*.rb").each do |f|
   begin
+    puts "Loading #{f}"
     Kernel.load(f)
   rescue => e
-    Raven.capture_exception(e, RAVEN_TAGS)
+    error_handler(e)
   end
 end
 
