@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+begin
+  require_relative "../vendor/bundle/bundler/setup"
+rescue LoadError => ex
+  $stderr.puts "Using bundler/setup"
+  require 'bundler/setup'
+end
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '../lib'))
