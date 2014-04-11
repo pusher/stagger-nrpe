@@ -41,8 +41,13 @@ class NrpeConnection < EM::Connection
       end
 
       # test it
-      status, desc = definition[:block].call(*values)
-      send_response(status, desc)
+      begin
+        status, desc = definition[:block].call(*values)
+      rescue Exception => ex
+        send_response(:unknown, "#{ex.to_s}\n#{ex.backtrace.join(%Q{\n})}")
+      else
+        send_response(status, desc)
+      end
     }.errback {
       send_response(:warning, "unable to connect to stagger")
     }
