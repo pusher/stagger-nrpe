@@ -20,6 +20,7 @@ class NrpePacket
     critical: 2,
     unknown: 3
   }
+  RESPONSE_CODES.default = 3
 
   attr_accessor :packet_version, :crc32, :result_code, :buffer
 
@@ -76,7 +77,7 @@ class NrpePacket
     response = NrpePacket.new
     response.packet_type = :response
     response.result_code = RESPONSE_CODES[result]
-    response.buffer = message
+    response.buffer = message.to_s
     response.to_bytes
   end
 end
