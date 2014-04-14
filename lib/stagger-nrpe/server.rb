@@ -26,8 +26,12 @@ puts "Loading config from #{config_dir}"
 $DEFS = CheckDefinitions.new
 Dir.glob("#{config_dir}/*.rb").each do |f|
   begin
-    puts "Loading #{f}"
-    Kernel.load(f)
+    if File.readable?(f)
+      puts "Loading #{f}"
+      Kernel.load(f)
+    else
+      puts "File #{f} unreadable, #{File.stat(f).inspect}"
+    end
   rescue => e
     error_handler(e)
   end
