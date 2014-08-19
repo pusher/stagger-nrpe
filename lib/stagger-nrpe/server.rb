@@ -7,8 +7,8 @@ unless ENVIRONMENT == 'development'
 end
 
 def error_handler(e)
-  puts e
-  puts e.backtrace.join("\n")
+  Log.error e
+  Log.error e.backtrace.join("\n")
   Raven.capture_exception(e, {
     tags: {
       service: "stagger-nrpe",
@@ -21,23 +21,23 @@ EM.error_handler { |e|
   error_handler(e)
 }
 
-puts "Loading config from #{config_dir}"
+Log.info "Loading config from #{config_dir}"
 
 $DEFS = CheckDefinitions.new
 Dir.glob("#{config_dir}/*.rb").each do |f|
   begin
     if File.readable?(f)
-      puts "Loading #{f}"
+      Log.info "Loading #{f}"
       Kernel.load(f)
     else
-      puts "File #{f} unreadable, #{File.stat(f).inspect}"
+      Log.error "File #{f} unreadable, #{File.stat(f).inspect}"
     end
   rescue => e
     error_handler(e)
   end
 end
 
-puts "Loaded #{$DEFS.count} definitions"
+Log.info "Loaded #{$DEFS.count} definitions"
 
 stagger_client = StaggerClient.new('localhost', '8990')
 

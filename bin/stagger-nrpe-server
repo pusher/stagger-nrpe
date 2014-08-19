@@ -19,5 +19,7 @@ require 'sentry-raven'
 
 ENVIRONMENT = ENV['ENVIRONMENT'] || "development"
 
+Log = Logger.new(STDOUT)
+
 # Actually runs the server
 require 'stagger-nrpe/server'

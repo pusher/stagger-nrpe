@@ -13,7 +13,8 @@ class StaggerClient
 
     refresh_if_stale.callback {
       df.succeed(names.map { |name| @all[name].to_f })
-    }.errback {
+    }.errback { |e|
+      Log.warn("Failed to refresh values from stagger: #{e}")
       df.fail
     }
 
@@ -41,13 +42,21 @@ class StaggerClient
     http = EM::HttpRequest.new(URI("http://#{@host}:#{@port}/snapshot.json")).get
     http.callback {
       json = JSON.load(http.response)
-      json["Counters"]["stagger.timestamp"] = json["Timestamp"]
-      df.succeed(
-        # Return a map of metric to something with yields a value from to_f
-        json["Counters"].merge!(
-          Hash[json["Dists"].map{ |k, v| [k, Distribution.from_json(v)] }]
-        )
-      )
+      if json
+        if json["Counters"]
+          json["Counters"]["stagger.timestamp"] = json["Timestamp"]
+          df.succeed(
+            # Return a map of metric to something with yields a value from to_f
+            json["Counters"].merge!(
+              Hash[json["Dists"].map{ |k, v| [k, Distribution.from_json(v)] }]
+            )
+          )
+        else
+          df.fail("No 'Counters' in stagger response [#{json.inspect}]")
+        end
+      else
+        df.fail('No JSON returned from stagger')
+      end
     }.errback {
       df.fail
     }
