@@ -37,16 +37,15 @@ class NrpeConnection < EM::Connection
     @stagger_client.get(definition[:metrics]).callback { |values|
       if values.compact.size != values.size
         send_response(:unknown, "Missing metrics in: #{definition[:metrics]}")
-        return
-      end
-
-      # test it
-      begin
-        status, desc = definition[:block].call(*values)
-      rescue Exception => ex
-        send_response(:unknown, "#{ex.to_s}\n#{ex.backtrace.join(%Q{\n})}")
       else
-        send_response(status, desc)
+        # test it
+        begin
+          status, desc = definition[:block].call(*values)
+        rescue Exception => ex
+          send_response(:unknown, "#{ex.to_s}\n#{ex.backtrace.join(%Q{\n})}")
+        else
+          send_response(status, desc)
+        end
       end
     }.errback {
       send_response(:warning, "unable to connect to stagger")
